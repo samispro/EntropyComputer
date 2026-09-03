@@ -111,13 +111,10 @@ def run_program_callback():
             STATE_VARS["status_var"].set("Running Firewall Simulation...")
             VisualizationClass = FirewallVisualizationWindow
 
-            # Inputs from the GUI
             intended_threat = STATE_VARS["ThreatSignature_var"].get()
             intended_integrity = STATE_VARS["IntegrityCheck_var"].get()
             is_quantum_attack = STATE_VARS["quantum_attack_toggle_var"].get()
 
-            # --- FIX: INITIAL STATE FOR VISUALIZATION (Uses GUI names) ---
-            # This dictionary must use the keys that firewall_visualization.py expects.
             initial_state_for_vis = {
                 'ThreatSignature': intended_threat,  # Key used by visualization
                 'IntegrityCheck': intended_integrity,  # Key used by visualization
@@ -125,8 +122,6 @@ def run_program_callback():
                 'AttackStatus': 0
             }
 
-            # --- PROGRAM INITIAL STATE (Uses gate argument names) ---
-            # This dictionary is used by the EntropyProgram.
             initial_state = {
                 'Threat_Intent': intended_threat,
                 'Integrity_Intent': intended_integrity,
@@ -196,7 +191,7 @@ def run_program_callback():
                     intermediate_steps=program.intermediate_steps
                 )
 
-                # Update status bar with results
+
                 if active_tab == "Probabilistic Firewall":
                     decision_text = 'ALLOW' if result.final_state['Decision'] == 1 else 'DENY'
                     STATE_VARS["status_var"].set(
@@ -218,8 +213,8 @@ def run_program_callback():
 
 def create_gui():
     """Initializes and runs the CustomTkinter GUI."""
-    ctk.set_appearance_mode("Dark")  # Preserving user's last preferred dark mode setting
-    ctk.set_default_color_theme("blue")  # Preserving user's last preferred theme
+    ctk.set_appearance_mode("Dark")
+    ctk.set_default_color_theme("blue")  
 
     app = ctk.CTk()
     app.title("Entropy Computer v5.0: Cybersecurity Gates")
@@ -228,11 +223,9 @@ def create_gui():
     app.grid_columnconfigure(0, weight=1)
     app.grid_rowconfigure(3, weight=1)
 
-    # --- Title ---
     ctk.CTkLabel(app, text="Entropy Computer", font=ctk.CTkFont(size=20, weight="bold")).grid(
         row=0, column=0, padx=20, pady=(10, 5), sticky="ew")
 
-    # --- Control Frame (Seed) ---
     control_frame = ctk.CTkFrame(app)
     control_frame.grid(row=1, column=0, padx=20, pady=10, sticky="ew")
     control_frame.grid_columnconfigure(1, weight=1)
@@ -245,13 +238,11 @@ def create_gui():
                                                                                              padx=(5, 10), pady=10,
                                                                                              sticky="e")
 
-    # --- Status Bar ---
     STATE_VARS["status_var"] = ctk.StringVar(value="Status: Core not initialized. Enter seed or press Initialize.")
     ctk.CTkLabel(app, textvariable=STATE_VARS["status_var"], anchor="w", fg_color="#333333", text_color="#FFFFFF",
                  corner_radius=5).grid(
         row=2, column=0, padx=20, pady=(0, 10), sticky="ew")
 
-    # --- Tab View for Presets ---
     STATE_VARS["tab_view"] = ctk.CTkTabview(app, segmented_button_selected_color="#50FA7B",
                                             segmented_button_selected_hover_color="#40C862")
     STATE_VARS["tab_view"].grid(row=3, column=0, padx=20, pady=5, sticky="nsew")
@@ -266,7 +257,6 @@ def create_gui():
     tab_firewall = STATE_VARS["tab_view"].tab("Probabilistic Firewall")
     tab_anomaly = STATE_VARS["tab_view"].tab("Probabilistic Anomaly Detection")
 
-    # --- Helper for Radio Buttons ---
     def create_input_frame(parent, text, default_val, desc_0=None, desc_1=None):
         STATE_VARS[f"{text}_var"] = ctk.IntVar(value=default_val)
         frame = ctk.CTkFrame(parent, fg_color="transparent")
@@ -281,7 +271,6 @@ def create_gui():
                                                                                                        padx=20, pady=2)
         return frame
 
-    # --- Configure Adder Tab ---
     tab_adder.grid_columnconfigure(0, weight=1)
     ctk.CTkLabel(tab_adder, text="Set Initial State for 1-Bit Full Adder",
                  font=ctk.CTkFont(size=14, weight="bold")).grid(row=0, column=0, pady=10)
@@ -297,7 +286,6 @@ def create_gui():
                                                                                                      padx=20, pady=10,
                                                                                                      sticky="ew")
 
-    # --- Configure Search Tab ---
     tab_search.grid_columnconfigure(0, weight=1)
     ctk.CTkLabel(tab_search, text="Define Target State (The Needle in the Haystack)",
                  font=ctk.CTkFont(size=14, weight="bold")).grid(row=0, column=0, pady=10)
@@ -339,13 +327,12 @@ def create_gui():
     firewall_input_frame = ctk.CTkFrame(tab_firewall)
     firewall_input_frame.grid(row=1, column=0, pady=10)
 
-    # Note: Variable names must match the ones used in run_program_callback
+    
     create_input_frame(firewall_input_frame, "ThreatSignature", 1, desc_0="Safe (0)", desc_1="Threat (1)").pack(
         side="left", padx=20, fill="y")
     create_input_frame(firewall_input_frame, "IntegrityCheck", 1, desc_0="Corrupted (0)", desc_1="Intact (1)").pack(
         side="left", padx=20, fill="y")
 
-    # Quantum Attack Toggle
     STATE_VARS["quantum_attack_toggle_var"] = ctk.IntVar(value=0)  # Default to 0 (Binary/Ordinary)
     toggle_frame = ctk.CTkFrame(tab_firewall)
     toggle_frame.grid(row=2, column=0, pady=10)
@@ -362,7 +349,6 @@ def create_gui():
                                                                                                               pady=10,
                                                                                                               sticky="ew")
 
-    # --- Configure Anomaly Detection Tab ---
     tab_anomaly.grid_columnconfigure(0, weight=1)
     ctk.CTkLabel(tab_anomaly, text="Simulate Network Traffic Characteristics (for Anomaly Score)",
                  font=ctk.CTkFont(size=14, weight="bold")).grid(row=0, column=0, pady=10)
@@ -384,7 +370,6 @@ def create_gui():
                                                                                                            pady=10,
                                                                                                            sticky="ew")
 
-    # --- Final Setup ---
     initialize_core()
     app.mainloop()
 
