@@ -1,5 +1,5 @@
 # EntropyComputer
-A Noble paradigm of computation
+A Noble paradigm of computation (current used to demonstrate in CyberSecurity)
 
 ## License
 This project is All Rights Reserved and intended for **educational purposes only**. 
