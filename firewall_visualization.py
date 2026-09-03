@@ -9,14 +9,13 @@ import tkinter as tk
 from tkinter import font as tkfont
 from collections import namedtuple
 
-# Define colors for clarity in the firewall context
 COLOR_ALLOW = "#6a8759"
 COLOR_BLOCK = "#cc7832"
 COLOR_ATTACK = "#e05252"
 COLOR_NEUTRAL = "#888888"
-COLOR_VERDICT_SUCCESS = "#4CAF50"  # Green for successful defense/clean pass
-COLOR_VERDICT_WARNING = "#FFC107"  # Amber for overblock
-COLOR_VERDICT_FAILURE = "#F44336"  # Red for defense failure
+COLOR_VERDICT_SUCCESS = "#4CAF50"
+COLOR_VERDICT_WARNING = "#FFC107" 
+COLOR_VERDICT_FAILURE = "#F44336"
 
 
 class FirewallVisualizationWindow:
@@ -26,14 +25,13 @@ class FirewallVisualizationWindow:
         self.root = tk.Tk()
         self.root.title(title)
         self.root.configure(bg='#2b2b2b')
-        # --- MODIFICATION 1: Increased window size ---
         self.root.geometry("800x600")
 
         self.title_font = tkfont.Font(family="Helvetica", size=18, weight="bold")
         self.header_font = tkfont.Font(family="Helvetica", size=12, weight="bold")
         self.label_font = tkfont.Font(family="Helvetica", size=10)
         self.result_font = tkfont.Font(family="Courier", size=24, weight="bold")
-        # --- MODIFICATION 2: New font for verdict ---
+        
         self.verdict_font = tkfont.Font(family="Helvetica", size=16, weight="bold")
 
         self.create_widgets()
@@ -56,13 +54,11 @@ class FirewallVisualizationWindow:
         self.draw_input_state(io_frame, io_frame_bg, self.program_result.initial_state)
         self.draw_final_decision(io_frame, io_frame_bg, self.program_result.final_state)
 
-        # --- MODIFICATION 3: Add the Final Verdict Report Frame ---
         verdict_frame = tk.Frame(main_frame, bg=io_frame_bg, padx=15, pady=15, relief="flat", bd=1)
         verdict_frame.pack(fill="x", pady=(10, 20))
         self.draw_final_verdict(verdict_frame, io_frame_bg, self.program_result.initial_state,
                                 self.program_result.final_state)
 
-        # --- Processing Steps Trace ---
         steps_frame = tk.Frame(main_frame, bg='#3c3f41', bd=1, relief="sunken")
         steps_frame.pack(fill="both", expand=True, pady=(0, 0))  # Fill remaining space
 
@@ -70,7 +66,6 @@ class FirewallVisualizationWindow:
                                bg="#3c3f41")
         steps_label.pack(anchor="w", padx=10, pady=5)
 
-        # Use a scrolled text widget for long traces
         scrolled_text = tk.Text(steps_frame, bg="#2b2b2b", fg="#cccccc", font=self.label_font, relief="flat",
                                 wrap="word")
         scrolled_text.pack(fill="both", expand=True, padx=10, pady=(0, 10))
@@ -83,7 +78,7 @@ class FirewallVisualizationWindow:
             state_str = ", ".join([f"{k}:{v}" for k, v in relevant_state.items()])
             trace += f"{step_name.ljust(30)} -> [{state_str}]\n"
         scrolled_text.insert(tk.END, trace)
-        scrolled_text.config(state=tk.DISABLED)  # Make text read-only
+        scrolled_text.config(state=tk.DISABLED) 
 
     def draw_input_state(self, parent_frame, bg_color, state):
         input_frame = tk.Frame(parent_frame, bg=bg_color)
@@ -91,14 +86,12 @@ class FirewallVisualizationWindow:
         tk.Label(input_frame, text="Intended Packet Inputs (from GUI)", font=self.header_font, fg="#a9b7c6",
                  bg=bg_color).pack(pady=(0, 10))
 
-        # Threat Signature display
         sig_val = state['ThreatSignature']
         sig_text = "Threat (1)" if sig_val == 1 else "Safe (0)"
         sig_color = COLOR_ATTACK if sig_val == 1 else COLOR_NEUTRAL
         tk.Label(input_frame, text=f"Threat Signature: {sig_text}", font=self.label_font, fg=sig_color,
                  bg=bg_color).pack(anchor="w")
 
-        # Integrity Check display
         int_val = state['IntegrityCheck']
         int_text = "Intact (1)" if int_val == 1 else "Corrupted (0)"
         int_color = COLOR_ATTACK if int_val == 1 else COLOR_NEUTRAL
@@ -118,7 +111,6 @@ class FirewallVisualizationWindow:
                  bg=bg_color).pack(pady=(0, 10))
 
         decision = state.get('Decision', 0)  # 0=ALLOW, 1=BLOCK
-        # AttackStatus here reflects the status of the packet *as it reached the firewall*
         is_attack_on_firewall = state.get('AttackStatus', 0)
 
         if decision == 1:
@@ -135,7 +127,6 @@ class FirewallVisualizationWindow:
         defense_status = ""
         defense_color = ""
 
-        # Determine outcome based on what the firewall actually saw
         if is_attack_on_firewall == 1 and decision == 1:
             defense_status = "SUCCESSFUL DEFENSE (True Positive)"
             defense_color = COLOR_ALLOW
@@ -154,18 +145,14 @@ class FirewallVisualizationWindow:
         tk.Label(output_frame, text=defense_status, font=self.label_font, fg=defense_color, bg=bg_color).pack(
             anchor="w")
 
-    # --- MODIFICATION 4: New function to draw the Final Verdict ---
     def draw_final_verdict(self, parent_frame, bg_color, initial_state, final_state):
         tk.Label(parent_frame, text="--- Final Defense Verdict ---", font=self.header_font, fg="#a9b7c6",
                  bg=bg_color).pack(pady=(0, 10))
 
-        # Intended state from GUI
         intended_threat = initial_state['ThreatSignature'] == 1 and initial_state['IntegrityCheck'] == 1
 
-        # Actual state as it reached the firewall (after potential quantum attack effects)
         actual_threat_input = final_state.get('ThreatSignature', 0) == 1 and final_state.get('IntegrityCheck', 0) == 1
 
-        # Firewall's final decision
         decision = final_state.get('Decision', 0)  # 0=ALLOW, 1=BLOCK
 
         verdict_text = ""
